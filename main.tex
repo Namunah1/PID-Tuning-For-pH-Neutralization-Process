@@ -1,0 +1,114 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=0.8in]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{multicol}
+
+\title{\textbf{PID TUNING FOR pH NEUTRALIZATION PROCESS}}
+\author{
+    \textbf{Course:} Process Dynamics and Control \\[0.3em]
+    \textbf{Group Members:} 
+    Ashish Donth (230008011), 
+    Kumar Prince (230008019)
+}
+\date{}
+
+\begin{document}
+
+\maketitle
+\vspace{-0.5cm}
+
+\section{INTRODUCTION}
+pH control is one of the most challenging aspects in chemical process industries due to its highly nonlinear behavior. Maintaining the pH value at a desired setpoint is critical in applications like wastewater treatment, chemical reactors, and fermentation processes. Our project focuses on designing and tuning a PID controller to regulate the pH value of a neutralization process under various operating conditions. The primary objective is to achieve stable pH control at a setpoint of 8 while handling disturbances in feed concentration and flow rate.
+
+\section{PROCESS DESCRIPTION AND TRANSFER FUNCTION}
+
+The pH neutralization process involves mixing an acidic or basic stream with a neutralizing agent to achieve the desired pH level. The process exhibits first-order dynamics with a transport delay.
+
+\subsection{Transfer Function}
+The system is represented by:
+\begin{equation}
+G(s) = \frac{14s + 25}{1478.26s + 1}
+\end{equation}
+
+The numerator coefficients $(14s + 25)$ were selected based on the process gain and zero location. The coefficient 25 represents the steady-state gain, indicating how much the pH changes per unit change in manipulated variable. The zero at $s = -25/14 \approx -1.79$ suggests lead behavior for improved response time. The denominator $(1478.26s + 1)$ gives a time constant $\tau = 1478.26$ seconds (approximately 24.6 minutes), reflecting the slow dynamics typical of pH neutralization due to mixing requirements and reaction kinetics. A transport delay was incorporated to account for pipe length, residence time, and mixing lag. Measurement noise was added to simulate realistic pH probe behavior.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.55\textwidth]{block_diagram.jpg}
+\caption{Block diagram of PID controller for pH neutralization process}
+\label{fig:block}
+\end{figure}
+
+\section{CONTROLLER DESIGN}
+The control strategy employs a classical PID controller in feedback configuration. The controller generates control action based on proportional ($K_p$), integral ($K_i$), and derivative ($K_d$) terms. The PID parameters were tuned differently for each disturbance scenario to achieve optimal performance.
+
+\section{RESULTS AND ANALYSIS}
+
+\begin{figure}[H]
+\centering
+\begin{subfigure}{0.47\textwidth}
+    \includegraphics[width=\textwidth]{plot1.jpg}
+    \caption{Baseline response without disturbance}
+    \label{fig:plot1}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.47\textwidth}
+    \includegraphics[width=\textwidth]{plot2.jpg}
+    \caption{Response with concentration disturbance}
+    \label{fig:plot2}
+\end{subfigure}
+
+\vspace{0.2cm}
+
+\begin{subfigure}{0.47\textwidth}
+    \includegraphics[width=\textwidth]{plot3.jpg}
+    \caption{Response with flow rate disturbance (400\%)}
+    \label{fig:plot3}
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.47\textwidth}
+    \includegraphics[width=\textwidth]{plot4.jpg}
+    \caption{Response with combined disturbances}
+    \label{fig:plot4}
+\end{subfigure}
+\caption{pH response plots for different disturbance scenarios}
+\label{fig:all_plots}
+\end{figure}
+
+\textbf{Figure 2(a)} shows the baseline response starting from pH 2 to setpoint 8 with moderate overshoot and good settling behavior. \textbf{Figure 2(b)} demonstrates concentration disturbance (orange step) with reduced overshoot due to higher $K_p$ and lower $K_i$. \textbf{Figure 2(c)} shows flow rate disturbance (green step) handled with increased derivative action. \textbf{Figure 2(d)} presents the most challenging scenario with both disturbances, demonstrating robust control performance.
+
+\begin{table}[H]
+\centering
+\caption{Performance Comparison of Different Scenarios}
+\small
+\begin{tabular}{@{}lccccccc@{}}
+\toprule
+\textbf{Scenario} & \textbf{$K_p$} & \textbf{$K_i$} & \textbf{$K_d$} & \textbf{Overshoot} & \textbf{Rise Time} & \textbf{Settling Time} & \textbf{Decay Ratio} \\ \midrule
+Baseline & 4 & 2 & 1 & 56.25\% & $\sim$25s & $\sim$100s & 0.27 \\
+Concentration & 9 & 0.5 & 1 & 25\% & $\sim$20s & $\sim$80s & -- \\
+Flow Rate & 7 & 1 & 4 & 37.5\% & $\sim$30s & $\sim$120s & -- \\
+Combined & 8 & 0.5 & 4 & 31.25\% & $\sim$25s & $\sim$100s & -- \\ \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Key Observations}
+
+\textbf{Case 1 (Baseline):} System reaches from pH 2 to setpoint 8 with peak at 12.5 pH, giving 56.25\% overshoot. Decay ratio of 0.27 indicates good damping with second peak at 9.2 pH.
+
+\textbf{Case 2 (Concentration Disturbance):} When inlet concentration increases to 4, higher $K_p = 9$ provides aggressive error correction while lower $K_i = 0.5$ prevents integral windup. Overshoot reduced to 25\% with faster settling at 80 seconds.
+
+\textbf{Case 3 (Flow Rate Disturbance):} The 400\% flow increase creates severe challenge. Increased derivative gain ($K_d = 4$) dampens oscillations effectively. Recovery time extends to 120 seconds with 37.5\% overshoot.
+
+\textbf{Case 4 (Combined Disturbances):} Most realistic scenario with both disturbances. Balanced tuning ($K_p = 8$, $K_i = 0.5$, $K_d = 4$) achieves 31.25\% overshoot and robust performance across disturbance events.
+
+\section{CONCLUSION}
+
+This project successfully demonstrated PID controller tuning for pH neutralization under various disturbance scenarios. Baseline tuning with moderate gains provides acceptable performance but with higher overshoot (56\%). Concentration disturbances are best handled with high $K_p$ and low $K_i$ to prevent integral windup. Flow rate disturbances require increased derivative action ($K_d = 4$) for damping. Combined disturbances need balanced tuning for robust performance. The transport delay and measurement noise added realistic challenges similar to actual industrial pH control systems. Overall, the controller successfully maintained pH at the setpoint of 8 across all scenarios, though tuning adjustments were necessary for optimal disturbance rejection. Future work could explore adaptive tuning or advanced control strategies for even better performance under rapidly changing conditions.
+
+\end{document}
